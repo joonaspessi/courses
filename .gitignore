@@ -2,4 +2,6 @@
 .DS_Store
 .idea
 .git
-
+.vscode
+launch.json
+settings.json
