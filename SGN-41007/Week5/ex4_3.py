@@ -15,7 +15,7 @@ def log_loss(w, X, y):
         
     # Process each sample in X:
     for n in range(X.shape[0]):
-        L += np.log(1 + np.exp(y[n] * np.dot(w, X[n])))
+        L += np.log(1 + np.exp(-y[n] * np.dot(w, X[n])))
     
     return L
     
@@ -31,8 +31,8 @@ def grad(w, X, y):
     # Process each sample in X:
     for n in range(X.shape[0]):
         
-        numerator = 1     # TODO: Correct these lines
-        denominator = 1   # TODO: Correct these lines
+        numerator = -y[n] * X[n]
+        denominator = 1 + np.exp(y[n] * np.dot(w, X[n]))
         
         G += numerator / denominator
     
@@ -50,6 +50,7 @@ if __name__ == "__main__":
     w = np.array([1, -1])
     
     # 3) Set step_size to a small positive value.
+    step_size = 0.001
 
     # 4) Initialize empty lists for storing the path and
     # accuracies: W = []; accuracies = []
@@ -59,6 +60,7 @@ if __name__ == "__main__":
     for iteration in range(100):
 
         # 5) Apply the gradient descent rule.
+        w = w - step_size * grad(w, X, y)
 
         # 6) Print the current state.
         print ("Iteration %d: w = %s (log-loss = %.2f)" % \
@@ -95,5 +97,5 @@ if __name__ == "__main__":
     plt.ylabel('Accuracy / %')
     plt.xlabel('Iteration')
     plt.tight_layout()
-    plt.savefig("log_loss_minimization.pdf", bbox_inches = "tight")
+    plt.savefig(os.path.join(dir_path, "log_loss_minimization.pdf"), bbox_inches = "tight")
     
