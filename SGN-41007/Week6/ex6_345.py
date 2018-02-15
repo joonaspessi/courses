@@ -1,3 +1,4 @@
+import numpy as np
 from utils import absolute_file_paths
 from skimage import io
 from sklearn.model_selection import train_test_split
@@ -6,7 +7,8 @@ from os.path import join, dirname, realpath
 from keras.models import Sequential
 from keras.layers.core import Dense, Activation, Flatten
 from keras.layers.convolutional import Conv2D, MaxPooling2D
-import numpy as np
+from keras.optimizers import SGD
+from keras.utils import to_categorical
 
 dir_path = dirname(realpath(__file__))
 
@@ -27,6 +29,7 @@ def get_data():
         y.append(1)
 
     X = (X - np.min(X)) / np.max(X)
+    y = to_categorical(y,2)
 
     return X, y
 
@@ -38,29 +41,19 @@ if __name__ == "__main__":
 
     model = Sequential()
 
-    # N = 32  # Number of feature maps
-    # w, h = 5, 5  # Conv. window size
-    # model.add(Conv2D(N, (w, h), input_shape=(64, 64, 3), activation="relu", padding="same"))
-    # model.add(MaxPooling2D(pool_size=(4, 4)))
-    # model.add(Conv2D(N, (w, h), activation="relu", padding="same"))
-    # model.add(MaxPooling2D((4, 4)))
-    # model.add(Flatten())
-    # model.add(Dense(100, activation="sigmoid"))
-    # model.add(Dense(2, activation="sigmoid"))
-    #
-    # model.summary()
-
-    N = 10 # Number of feature maps
-    w, h = 5, 5 # Conv. window size
-    model.add(Conv2D(N, (w, h),
-    input_shape=(64, 64, 3),
-    activation = "relu",
-    padding = "same"))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(N, (w, h),
-    activation = "relu",
-    padding = "same"))
-    model.add(MaxPooling2D((2,2)))
+    N = 32  # Number of feature maps
+    w, h = 5, 5  # Conv. window size
+    model.add(Conv2D(N, (w, h), input_shape=(64, 64, 3), activation="relu", padding="same"))
+    model.add(MaxPooling2D(pool_size=(4, 4)))
+    model.add(Conv2D(N, (w, h), activation="relu", padding="same"))
+    model.add(MaxPooling2D((4, 4)))
     model.add(Flatten())
-    model.add(Dense(2, activation = "sigmoid"))
+    model.add(Dense(100, activation="sigmoid"))
+    model.add(Dense(2, activation="sigmoid"))
+
     model.summary()
+
+    model.compile(optimizer="SGD", loss="categorical_crossentropy", metrics=["accuracy"])
+    model.fit(X_train, y_train, batch_size=32, epochs=20)
+    scores = model.evaluate(X_cv, y_cv)
+    print("Cross validation %s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
