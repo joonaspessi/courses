@@ -43,6 +43,7 @@ if __name__ == "__main__":
 
     N = 32  # Number of feature maps
     w, h = 5, 5  # Conv. window size
+
     model.add(Conv2D(N, (w, h), input_shape=(64, 64, 3), activation="relu", padding="same"))
     model.add(MaxPooling2D(pool_size=(4, 4)))
     model.add(Conv2D(N, (w, h), activation="relu", padding="same"))
@@ -54,6 +55,9 @@ if __name__ == "__main__":
     model.summary()
 
     model.compile(optimizer="SGD", loss="categorical_crossentropy", metrics=["accuracy"])
+
     model.fit(X_train, y_train, batch_size=32, epochs=20)
+
     scores = model.evaluate(X_cv, y_cv)
+
     print("Cross validation %s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
